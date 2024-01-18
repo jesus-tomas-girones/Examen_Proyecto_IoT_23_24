@@ -5,6 +5,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.google.firebase.firestore.FirebaseFirestore;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +17,9 @@ public class MainActivity extends AppCompatActivity {
     static long INICIO[]   = {0,     2,     5,     9,     15,    20,    21,    23};
     static String NOMBRE[] = {"Rosa","Juan","Rosa","Pere","Rosa","Juan","Pere","Juan"};
     static double SUELDO[] = {0.22,  0.19,  0.2,   0.18,  0.2,   0.19,  0.2,   0.3};
+
+    //3. ESCRITURA DE DATOS
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,5 +73,12 @@ public class MainActivity extends AppCompatActivity {
         }
         costeJornada += (FINAL - turnos.get(turnos.size() - 1).getInicio()) * turnos.get(turnos.size() - 1).getSueldoEnEuros();
         Log.d("examen", "Coste Jornada (alternativo): " + costeJornada);
+
+        //3. ESCRITURA DE DATOS
+        int contador = 0;
+        for(TurnoControlador turno:turnos){
+            db.collection("turnos").document(Integer.toString(contador)).set(turno);
+            contador += 1;
+        }
     }
 }
