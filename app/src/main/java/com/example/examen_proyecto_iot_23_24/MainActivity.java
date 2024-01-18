@@ -1,11 +1,15 @@
 package com.example.examen_proyecto_iot_23_24;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
 import android.util.Log;
 
+import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 
 import java.util.HashMap;
 import java.util.List;
@@ -20,6 +24,9 @@ public class MainActivity extends AppCompatActivity {
 
     //3. ESCRITURA DE DATOS
     FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+    //4. RECICLERVIEW
+    private Adapter adaptador;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,5 +87,28 @@ public class MainActivity extends AppCompatActivity {
             db.collection("turnos").document(Integer.toString(contador)).set(turno);
             contador += 1;
         }
+
+        //4. RECICLERVIEW
+        RecyclerView recyclerView = findViewById(R.id.recycler_view);
+        Query query = FirebaseFirestore.getInstance()
+                .collection("turnos");
+        FirestoreRecyclerOptions<TurnoControlador> opciones = new FirestoreRecyclerOptions
+                .Builder<TurnoControlador>().setQuery(query, TurnoControlador.class).build();
+        adaptador = new Adapter( opciones);
+        recyclerView.setAdapter(adaptador);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
     }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        adaptador.startListening();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        adaptador.stopListening();
+    }
+
 }
